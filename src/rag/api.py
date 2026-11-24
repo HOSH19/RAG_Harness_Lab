@@ -8,6 +8,7 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
+from .backend import backend_status, effective_model_id
 from .config import ROOT, get_settings, load_rag_config
 from .ingest import ingest_path
 from .llm import chat, chat_stream, ping
@@ -59,6 +60,7 @@ def health() -> dict[str, Any]:
         "collection": settings.collection_name,
         "chunks": chunks,
         "collection_error": collection_error,
+        "backend": backend_status(),
         "vllm": vllm_status,
     }
 
@@ -146,8 +148,10 @@ def chat_stream_endpoint(body: ChatRequest) -> StreamingResponse:
 def config_endpoint() -> dict[str, Any]:
     settings = get_settings()
     return {
-        "model_id": settings.model_id,
+        "model_id": effective_model_id(),
+        "model_id_explicit": settings.model_id_explicit,
         "vllm_base_url": settings.vllm_base_url,
+        "backend": backend_status(),
         "rag": load_rag_config(),
     }
 

@@ -1,4 +1,31 @@
+# Backend switch: set LLM_BACKEND=auto|cuda|metal|remote|none in .env
+# auto picks metal on Apple Silicon, otherwise cuda.
+
 default_model: Qwen/Qwen2.5-7B-Instruct
+
+backends:
+  cuda:
+    model_id: Qwen/Qwen2.5-7B-Instruct
+    max_model_len: 4096
+    gpu_memory_utilization: 0.85
+    serve_via: docker-compose
+    notes: "NVIDIA CUDA — Docker Compose or native vllm serve."
+    install_hint: "docker compose --env-file .env up vllm"
+  metal:
+    model_id: Qwen/Qwen2.5-3B-Instruct
+    max_model_len: 4096
+    gpu_memory_utilization: 0.5
+    serve_via: vllm-metal
+    notes: "Apple Silicon via vllm-metal (macOS 15+). Do not use the NVIDIA Docker image."
+    install_hint: "brew tap vllm-project/vllm-metal https://github.com/vllm-project/vllm-metal && brew install vllm-project/vllm-metal/vllm-metal"
+  remote:
+    serve_via: remote
+    notes: "Point VLLM_BASE_URL at a remote OpenAI-compatible /v1 endpoint."
+    install_hint: "Set VLLM_BASE_URL; no local serve."
+  none:
+    serve_via: none
+    notes: "RAG/retrieval only — no generation endpoint required."
+    install_hint: "python -m harness.runner --suite smoke --mode retrieval"
 
 models:
   Qwen/Qwen2.5-7B-Instruct:
@@ -6,9 +33,9 @@ models:
     gpu_memory_utilization: 0.85
     notes: "Default for RTX 5000 Ada 16GB — solid quality/fit."
   Qwen/Qwen2.5-3B-Instruct:
-    max_model_len: 8192
-    gpu_memory_utilization: 0.75
-    notes: "Faster / more headroom if 7B OOMs with long context."
+    max_model_len: 4096
+    gpu_memory_utilization: 0.5
+    notes: "Better default for M2/M3 Air (8–16GB) with vllm-metal."
   meta-llama/Llama-3.1-8B-Instruct:
     max_model_len: 4096
     gpu_memory_utilization: 0.85

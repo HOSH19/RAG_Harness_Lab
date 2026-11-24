@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -18,9 +18,21 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    model_id: str = Field(default="Qwen/Qwen2.5-7B-Instruct", alias="MODEL_ID")
+    # auto|cuda|metal|remote|none — see rag.backend
+    llm_backend: str = Field(default="auto", alias="LLM_BACKEND")
+
+    # Empty => use backend profile default model
+    model_id: str = Field(default="", alias="MODEL_ID")
+    max_model_len: int | None = Field(default=None, alias="MAX_MODEL_LEN")
+    gpu_memory_utilization: float | None = Field(
+        default=None,
+        alias="GPU_MEMORY_UTILIZATION",
+    )
+
     vllm_base_url: str = Field(default="http://localhost:8000/v1", alias="VLLM_BASE_URL")
     vllm_api_key: str = Field(default="EMPTY", alias="VLLM_API_KEY")
+    vllm_host: str = Field(default="0.0.0.0", alias="VLLM_HOST")
+    vllm_port: int = Field(default=8000, alias="VLLM_PORT")
 
     rag_api_host: str = Field(default="0.0.0.0", alias="RAG_API_HOST")
     rag_api_port: int = Field(default=8080, alias="RAG_API_PORT")
@@ -35,6 +47,26 @@ class Settings(BaseSettings):
 
     models_config: str = Field(default="configs/models.yaml", alias="MODELS_CONFIG")
     rag_config: str = Field(default="configs/rag.yaml", alias="RAG_CONFIG")
+
+    @field_validator("model_id", "llm_backend", mode="before")
+    @classmethod
+    def strip_str(cls, value: Any) -> Any:
+        if isinstance(value, str):
+            return value.strip()
+        return value
+
+    @field_validator("max_model_len", "gpu_memory_utilization", mode="before")
+    @classmethod
+    def empty_to_none(cls, value: Any) -> Any:
+        if value is None:
+            return None
+        if isinstance(value, str) and value.strip() == "":
+            return None
+        return value
+
+    @property
+    def model_id_explicit(self) -> bool:
+        return bool(self.model_id.strip())
 
     @property
     def chroma_dir(self) -> Path:
@@ -66,3 +98,9 @@ def load_rag_config() -> dict[str, Any]:
 def reload_configs() -> None:
     get_settings.cache_clear()
     load_rag_config.cache_clear()
+    try:
+        from .backend import reload_backend
+
+        reload_backend()
+    except Exception:  # noqa: BLE001
+        pass

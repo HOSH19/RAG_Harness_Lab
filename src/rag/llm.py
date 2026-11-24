@@ -5,6 +5,7 @@ from typing import Any
 
 from openai import OpenAI
 
+from .backend import effective_model_id
 from .config import get_settings, load_rag_config
 
 
@@ -18,7 +19,7 @@ def get_client(*, timeout: float = 120.0) -> OpenAI:
 
 
 def resolve_model(model: str | None = None) -> str:
-    return model or get_settings().model_id
+    return model or effective_model_id()
 
 
 def chat(

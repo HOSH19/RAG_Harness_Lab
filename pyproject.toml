@@ -31,13 +31,16 @@ st = ["sentence-transformers>=3.3.0"]
 [project.scripts]
 rag-api = "rag.api:main"
 rag-ingest = "rag.ingest:main"
+rag-doctor = "rag.doctor:main"
 
 [tool.setuptools]
-packages = ["rag", "harness"]
+packages = ["rag", "harness", "harness.cases"]
 
 [tool.setuptools.package-dir]
 rag = "src/rag"
 harness = "harness"
+"harness.cases" = "harness/cases"
 
 [tool.setuptools.package-data]
 harness = ["cases/*.yaml"]
+harness.cases = ["*.yaml"]
