@@ -1,0 +1,17 @@
+- id: token_ttl
+  suite: smoke
+  question: How long do AcmeOps access tokens last before they expire?
+  expected_doc_ids: [api-auth]
+  expected_answer_contains: ["3600"]
+
+- id: ao_2002
+  suite: smoke
+  question: What does error code AO-2002 mean?
+  expected_doc_ids: [error-codes]
+  expected_answer_contains: ["max-batch-tokens", "8192"]
+
+- id: out_of_scope_capital
+  suite: smoke
+  question: What is the capital of France according to AcmeOps docs?
+  expected_doc_ids: []
+  expect_refuse: true

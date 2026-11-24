@@ -1,0 +1,71 @@
+- id: token_ttl
+  suite: full
+  question: How long do AcmeOps access tokens last before they expire?
+  expected_doc_ids: [api-auth]
+  expected_answer_contains: ["3600"]
+
+- id: token_ttl_paraphrase
+  suite: full
+  question: After how many seconds should I mint a new AcmeOps bearer token?
+  expected_doc_ids: [api-auth]
+  expected_answer_contains: ["3600"]
+
+- id: canary_prod
+  suite: full
+  question: What canary percent is recommended for a production AcmeOps deploy?
+  expected_doc_ids: [deploy-flags]
+  expected_answer_contains: ["5"]
+
+- id: max_batch_tokens_flag
+  suite: full
+  question: What is the default value of --max-batch-tokens?
+  expected_doc_ids: [deploy-flags]
+  expected_answer_contains: ["2048"]
+
+- id: ao_2002
+  suite: full
+  question: What does error code AO-2002 mean?
+  expected_doc_ids: [error-codes]
+  expected_answer_contains: ["max-batch-tokens", "8192"]
+
+- id: invalid_upstream_json
+  suite: full
+  question: What should I check when I see invalid_upstream_json?
+  expected_doc_ids: [error-codes]
+  expected_answer_contains: ["vLLM", "health"]
+
+- id: oom_runbook
+  suite: full
+  question: My pod is CrashLoopBackOff from OOM. What should I try first?
+  expected_doc_ids: [runbooks-restart]
+  expected_answer_contains: ["max-batch-tokens"]
+
+- id: rpm_quota
+  suite: full
+  question: What is the chat requests per minute soft limit?
+  expected_doc_ids: [quotas]
+  expected_answer_contains: ["120"]
+
+- id: citation_format
+  suite: full
+  question: How should RAG answers cite passages?
+  expected_doc_ids: [rag-service]
+  expected_answer_contains: ["doc_id", "chunk_index"]
+
+- id: multi_hop_oom_and_oncall
+  suite: full
+  question: If restarts continue for more than 15 minutes after OOM mitigations, who do I page?
+  expected_doc_ids: [runbooks-restart, oncall]
+  expected_answer_contains: ["oncall-platform"]
+
+- id: out_of_scope_capital
+  suite: full
+  question: What is the capital of France according to AcmeOps docs?
+  expected_doc_ids: []
+  expect_refuse: true
+
+- id: out_of_scope_weather
+  suite: full
+  question: Will it rain tomorrow in Manila according to our runbooks?
+  expected_doc_ids: []
+  expect_refuse: true

@@ -1,0 +1,33 @@
+chunking:
+  chunk_size: 512
+  chunk_overlap: 64
+
+retrieval:
+  top_k: 5
+  hybrid: true
+  dense_weight: 0.7
+  sparse_weight: 0.3
+
+generation:
+  temperature: 0.2
+  max_tokens: 512
+  stream: true
+
+agent:
+  max_tool_rounds: 4
+  temperature: 0.1
+  max_tokens: 768
+
+prompts:
+  system: |
+    You are a careful assistant for the AcmeOps internal knowledge base.
+    Answer ONLY using the provided context passages.
+    Cite sources using the form [doc_id#chunk_index], for example [api-auth#0].
+    If the context does not contain the answer, say you do not know and refuse to guess.
+  user_template: |
+    Context:
+    {context}
+
+    Question: {question}
+
+    Answer with citations when possible.
